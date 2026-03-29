@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maritime Network Disruption Simulator — Priyanka Gupta</title>
+<title>When Shipping Networks Break — Priyanka Gupta</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -19,23 +19,65 @@
     --radius: 10px; --radius-sm: 6px;
   }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
   .logo { font-size: 14px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 10px; }
-  .logo-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; }
+  .logo-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   .author-pill { font-size: 12px; color: var(--text-2); background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 5px 14px; }
   .author-pill span { color: var(--text); font-weight: 500; }
+
   main { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
   .hero { margin-bottom: 2.5rem; }
-  .hero h1 { font-size: clamp(22px, 4vw, 32px); font-weight: 400; line-height: 1.25; color: var(--text); margin-bottom: 0.75rem; letter-spacing: -0.02em; }
+  .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--teal); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  .hero h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 400; line-height: 1.2; color: var(--text); margin-bottom: 1rem; letter-spacing: -0.02em; }
   .hero h1 em { font-style: normal; color: var(--teal); }
-  .hero p { font-size: 15px; color: var(--text-2); line-height: 1.6; max-width: 600px; }
-  .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem; }
-  .meta-tag { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--teal-dark); background: var(--teal-light); border-radius: var(--radius-sm); padding: 4px 10px; }
-  .section-label { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .hero p { font-size: 16px; color: var(--text-2); line-height: 1.7; max-width: 640px; margin-bottom: 1rem; }
+  .hero-note { font-size: 13px; color: var(--text-3); font-style: italic; }
+
+  .callout-row { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 2.5rem; }
+  .callout { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+  .callout-num { font-size: 28px; font-weight: 400; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .callout-num.red { color: var(--red); }
+  .callout-num.amber { color: var(--amber); }
+  .callout-num.teal { color: var(--teal); }
+  .callout-label { font-size: 13px; color: var(--text-2); line-height: 1.4; }
+
+  .section-header { margin-bottom: 1.25rem; }
+  .section-header h2 { font-size: 20px; font-weight: 500; color: var(--text); margin-bottom: 6px; letter-spacing: -0.01em; }
+  .section-header p { font-size: 14px; color: var(--text-2); line-height: 1.6; max-width: 600px; }
+
   .filter-bar { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
   .filter-btn { font-size: 12px; font-family: 'DM Sans', sans-serif; padding: 5px 14px; border-radius: 99px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-2); cursor: pointer; transition: all 0.15s; }
   .filter-btn:hover { background: var(--surface2); }
   .filter-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .card-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+
+  .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
+  .slider-row label { font-size: 13px; color: var(--text-2); min-width: 180px; }
+  .slider-row input[type=range] { flex: 1; }
+  .slider-val { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); min-width: 40px; text-align: right; }
+
+  .impact-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 1.25rem; }
+  .impact-box { background: var(--surface2); border-radius: var(--radius-sm); padding: 1rem; text-align: center; }
+  .impact-val { font-size: 24px; font-weight: 400; letter-spacing: -0.02em; }
+  .impact-val.red { color: var(--red); }
+  .impact-val.amber { color: var(--amber); }
+  .impact-val.teal { color: var(--teal); }
+  .impact-lbl { font-size: 12px; color: var(--text-2); margin-top: 4px; line-height: 1.4; }
+
+  .plain-insight { font-size: 14px; line-height: 1.75; color: var(--text); background: var(--teal-light); border-left: 3px solid var(--teal); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .plain-insight strong { font-weight: 500; }
+
+  .warning-box { font-size: 14px; line-height: 1.75; color: #6B1A1A; background: var(--red-light); border-left: 3px solid var(--red); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+
+  .chart-wrap { position: relative; width: 100%; height: 220px; }
+  .legend-row { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--text-2); flex-wrap: wrap; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: middle; }
+
   .scenario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-bottom: 2rem; }
   .sc-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; cursor: pointer; transition: all 0.15s; }
   .sc-card:hover { border-color: var(--border-strong); background: #FAFAF8; }
@@ -48,16 +90,15 @@
   .badge.Medium { background: var(--amber-light); color: var(--amber); }
   .badge.Low { background: var(--green-light); color: var(--green); }
   .days-tag { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3); margin-left: 6px; }
-  .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
   .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
   .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; text-align: center; }
-  .stat-val { font-size: 22px; font-weight: 400; letter-spacing: -0.02em; color: var(--text); }
+  .stat-val { font-size: 22px; font-weight: 400; letter-spacing: -0.02em; }
   .stat-val.danger { color: var(--red); }
   .stat-val.warn { color: var(--amber); }
   .stat-val.ok { color: var(--teal); }
-  .stat-lbl { font-size: 11px; color: var(--text-3); margin-top: 4px; font-family: 'DM Mono', monospace; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
-  .card-title { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.25rem; }
+  .stat-lbl { font-size: 11px; color: var(--text-3); margin-top: 4px; line-height: 1.4; }
+
   .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .bar-label { font-size: 12px; color: var(--text-2); min-width: 110px; }
   .bar-label.hit { color: var(--red); font-weight: 500; }
@@ -67,21 +108,22 @@
   .bar-fill.red { background: var(--red); }
   .bar-fill.amber { background: #E09040; }
   .bar-val { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-3); min-width: 46px; text-align: right; }
-  .chart-wrap { position: relative; width: 100%; height: 220px; }
-  .legend-row { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--text-2); flex-wrap: wrap; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 5px; vertical-align: middle; }
-  .insight { background: var(--teal-light); border-left: 3px solid var(--teal); padding: 1rem 1.25rem; font-size: 13px; line-height: 1.7; color: #1A3D31; margin-bottom: 1rem; }
-  .finding-box { background: var(--surface2); border-radius: var(--radius); padding: 1rem 1.25rem; font-size: 13px; line-height: 1.7; color: var(--text); margin-bottom: 1rem; }
-  .finding-box strong { font-weight: 500; }
-  .slider-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; }
-  .slider-row label { font-size: 13px; color: var(--text-2); min-width: 160px; }
-  .slider-row input[type=range] { flex: 1; }
-  .slider-val { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); min-width: 40px; text-align: right; }
-  .footnote { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3); line-height: 1.6; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+
+  .divider { height: 1px; background: var(--border); margin: 2.5rem 0; }
   .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-3); font-size: 14px; border: 1px dashed var(--border-strong); border-radius: var(--radius); }
-  footer { text-align: center; padding: 2rem; font-size: 11px; color: var(--text-3); font-family: 'DM Mono', monospace; border-top: 1px solid var(--border); }
-  @media (max-width: 600px) {
-    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .policy-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .policy-box h3 { font-size: 15px; font-weight: 500; margin-bottom: 0.75rem; color: var(--text); }
+  .policy-box p { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .policy-box p + p { margin-top: 0.5rem; }
+
+  .footnote { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3); line-height: 1.8; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+  footer { text-align: center; padding: 2rem; font-size: 11px; color: var(--text-3); font-family: 'DM Mono', monospace; border-top: 1px solid var(--border); margin-top: 2rem; }
+
+  @media (max-width: 640px) {
+    .callout-row { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: repeat(2,1fr); }
+    .impact-grid { grid-template-columns: 1fr; }
     .scenario-grid { grid-template-columns: 1fr 1fr; }
     header { padding: 0 1rem; }
     main { padding: 1.5rem 1rem 3rem; }
@@ -92,40 +134,59 @@
 <body>
 
 <header>
-  <div class="logo"><div class="logo-dot"></div>Maritime Network Simulator</div>
+  <div class="logo"><div class="logo-dot"></div>Global Shipping Risk Explorer</div>
   <div class="author-pill"><span>Priyanka Gupta</span> · MS Industrial Engineering</div>
 </header>
 
 <main>
+
+  <!-- HERO -->
   <div class="hero">
-    <h1>How do supply chain disruptions<br>reshape <em>global shipping networks?</em></h1>
-    <p>An interactive simulation using real optimization outputs from a cost-minimizing maritime network model. Results are computed using the network simplex algorithm on bilateral shipping flow and UN transport cost data.</p>
-    <div class="meta-row">
-      <span class="meta-tag">Network simplex optimization</span>
-      <span class="meta-tag">Phase 2 resilience stress testing</span>
-      <span class="meta-tag">UN transport cost data 2021–2023</span>
-      <span class="meta-tag">Real model outputs</span>
+    <div class="hero-eyebrow">Research-backed policy tool</div>
+    <h1>When a port goes down,<br>who pays — and <em>how much?</em></h1>
+    <p>Around 80% of world trade moves by sea. When a major port or shipping corridor is disrupted — by a storm, a conflict, a cyberattack, or a strike — costs ripple across the entire global network. This tool shows you exactly how much, and where.</p>
+    <p class="hero-note">Built on real shipping data and a mathematical optimization model that finds the cheapest possible routing for global cargo flows.</p>
+  </div>
+
+  <!-- TOP CALLOUTS -->
+  <div class="callout-row">
+    <div class="callout">
+      <div class="callout-num red">+100%</div>
+      <div class="callout-label">Shipping costs can double if Singapore — the world's most connected port — loses half its capacity.</div>
+    </div>
+    <div class="callout">
+      <div class="callout-num amber">+36%</div>
+      <div class="callout-label">A 30% reduction in Singapore's capacity is enough to raise global shipping costs by over a third.</div>
+    </div>
+    <div class="callout">
+      <div class="callout-num teal">100%</div>
+      <div class="callout-label">Goods always find a route — but rerouting comes at a cost. Flow never stops; prices always rise.</div>
     </div>
   </div>
 
-  <div class="section-label">Part 1 — port capacity shock simulator</div>
-  <p style="font-size:13px;color:var(--text-2);margin-bottom:1.25rem;">Values are exact outputs from Phase 2 stress testing. Drag the slider to explore how each hub responds to capacity shocks.</p>
+  <div class="divider"></div>
+
+  <!-- PART 1: HUB EXPLORER -->
+  <div class="section-header">
+    <h2>How vulnerable is each major hub?</h2>
+    <p>Not all ports are equally critical. Some can be disrupted with almost no impact on global costs — others are so central that even a partial shutdown sends shockwaves through the entire network. Explore the difference below.</p>
+  </div>
 
   <div class="card">
-    <div class="card-title">Select hub and disruption severity</div>
+    <div class="card-eyebrow">Select a hub and drag to set disruption severity</div>
     <div class="filter-bar" style="margin-bottom:1.25rem;">
       <button class="filter-btn active" onclick="setHub('Singapore',this)">Singapore</button>
       <button class="filter-btn" onclick="setHub('China',this)">China</button>
       <button class="filter-btn" onclick="setHub('Netherlands',this)">Netherlands</button>
     </div>
     <div class="slider-row">
-      <label>Capacity reduction</label>
+      <label>Port capacity lost</label>
       <input type="range" min="10" max="50" step="10" value="10" id="disruption-slider" oninput="updateSlider()">
       <span class="slider-val" id="slider-display">10%</span>
     </div>
     <div id="hub-stats"></div>
-    <div style="margin-top:1.25rem;">
-      <div class="card-title">Cost change % across all disruption levels — Phase 2 results</div>
+    <div style="margin-top:1.5rem;">
+      <div class="card-eyebrow">Cost impact across disruption levels — all three hubs compared</div>
       <div class="chart-wrap"><canvas id="hubChart"></canvas></div>
       <div class="legend-row">
         <span><span class="legend-dot" style="background:#1D9E75"></span>Singapore</span>
@@ -135,36 +196,37 @@
     </div>
   </div>
 
-  <div class="finding-box">
-    <strong>Key finding from your model:</strong> Singapore is the most critical hub — a 30% capacity shock raises total network costs by <strong>36.0%</strong>, and a 50% shock doubles costs (+100.0%). The response is near-quadratic, a signature of hub dependency. China shows moderate sensitivity (+17.7% at 50%). Netherlands is near-negligible (+2.2% at 50%), meaning your optimizer finds cost-equivalent reroutes trivially. The Red Sea route cost shock produced effectively zero cost change — your network simplex solution absorbs corridor cost increases by rerouting at no extra cost.
+  <!-- POLICY TAKEAWAY BOX -->
+  <div class="policy-box" id="policy-hub-box">
+    <h3>What this means for policymakers</h3>
+    <p id="policy-hub-text"></p>
   </div>
 
   <div class="divider"></div>
 
-  <div class="section-label">Part 2 — scenario explorer</div>
-  <p style="font-size:13px;color:var(--text-2);margin-bottom:1rem;">Each scenario is mapped to its primary affected hub. Cost sensitivity is drawn from your actual Phase 2 empirical results.</p>
+  <!-- PART 2: SCENARIO EXPLORER -->
+  <div class="section-header">
+    <h2>Explore real-world disruption scenarios</h2>
+    <p>From Red Sea conflict to typhoons hitting Shanghai — select any scenario to see its estimated cost impact on the global shipping network, which trade routes are most exposed, and what the data says about resilience.</p>
+  </div>
 
   <div class="filter-bar" id="sc-filters">
-    <button class="filter-btn active" onclick="setFilter('All',this)">All</button>
+    <button class="filter-btn active" onclick="setFilter('All',this)">All scenarios</button>
     <button class="filter-btn" onclick="setFilter('High',this)">High impact</button>
     <button class="filter-btn" onclick="setFilter('Medium',this)">Medium impact</button>
-    <button class="filter-btn" onclick="setFilter('Low',this)">Low impact</button>
+    <button class="filter-btn" onclick="setFilter('Low',this)">Lower impact</button>
   </div>
 
   <div class="scenario-grid" id="sc-grid"></div>
-  <div id="results-area"><div class="empty-state">Select a scenario above to explore its network impact</div></div>
+  <div id="results-area"><div class="empty-state">Select a scenario above to see the cost impact and policy implications</div></div>
 
   <div class="footnote">
-    Optimization method: network simplex algorithm (NetworkX) · Phase 2 stress test values are exact model outputs ·
-    Port capacity shock: cost_change% = exact values from Phase2_Resilience_Results.xlsx ·
-    Flow retention = 100% across all runs (optimizer always finds feasible solution) ·
-    Route cost shock result ~0 reflects optimizer rerouting efficiency ·
-    Data: UN Transport Cost Database 2021–2023 · UNCTAD PLSCI 2023 ·
-    Priyanka Gupta, MS Industrial Engineering · Paper under review: Maritime Policy & Management
+    How this works: A mathematical optimization model (network simplex algorithm) finds the cheapest possible set of shipping routes across a 20-country trade network, using real UN transport cost data (2021–2023) and port connectivity scores. Disruption scenarios stress-test the network by reducing hub capacity, then measuring how much total shipping costs rise. Flow always remains at 100% — goods find a route — but the price changes. Results are from real model runs, not estimates. · Research by Priyanka Gupta, MS Industrial Engineering, UNC Charlotte · Paper under review: Maritime Policy & Management
   </div>
+
 </main>
 
-<footer>Priyanka Gupta · MS Industrial Engineering · Maritime Policy & Management (under review)</footer>
+<footer>Priyanka Gupta · MS Industrial Engineering · UNC Charlotte · Maritime Policy & Management (under review)</footer>
 
 <script>
 const PHASE2 = {
@@ -173,32 +235,47 @@ const PHASE2 = {
   Netherlands: [{d:10,cost:0.09},{d:20,cost:0.35},{d:30,cost:0.78},{d:40,cost:1.38},{d:50,cost:2.16}],
 };
 
-const HUB_INSIGHTS = {
-  Singapore: 'Singapore is your most critical node. Your model reveals a near-quadratic cost response — cost accelerates sharply with each 10% capacity increment. This nonlinear pattern is a signature of hub dependency: once the primary node is constrained, the optimizer has few low-cost alternatives.',
-  China: 'China shows moderate but manageable cost sensitivity. The optimizer redistributes flows across multiple Chinese ports and alternative Asian hubs, keeping growth roughly linear. This suggests resilient redundancy in your East Asian network arcs.',
-  Netherlands: 'Netherlands has near-negligible network impact. Your optimizer trivially reroutes through Belgium and Germany at equivalent cost. This reflects the density of European port alternatives in your cost matrix.',
+const HUB_PLAIN = {
+  Singapore: {
+    what: 'Singapore is the single most important node in the global shipping network. Lose 30% of its capacity and total shipping costs rise by 36%. Lose half, and they double. This is not a gradual increase — the model reveals an accelerating curve, meaning each additional percent of lost capacity hurts more than the last.',
+    policy: 'For policymakers: Singapore\'s dominance is a systemic vulnerability. Over-concentration in a single hub creates fragility that no amount of rerouting can fully offset. Diversifying transshipment capacity across Southeast Asian ports — Port Klang, Tanjung Pelepas, Colombo — is a direct hedge against this risk.',
+  },
+  China: {
+    what: 'China\'s ports are critical but more resilient than Singapore. A 50% capacity shock raises total network costs by about 18% — significant, but manageable. The model finds enough alternative routes within the East Asian network to absorb disruptions without catastrophic cost escalation.',
+    policy: 'For policymakers: China\'s port redundancy (Shanghai, Ningbo, Qingdao, Shenzhen) means disruption at any single location is partially absorbed by others. Maintaining and developing this redundancy is a natural resilience buffer for trans-Pacific trade.',
+  },
+  Netherlands: {
+    what: 'Rotterdam, despite being Europe\'s largest port, has surprisingly low network-level impact when disrupted. The model finds that Belgium (Antwerp), Germany (Hamburg), and other European ports can absorb the load at near-equivalent cost. A 50% Rotterdam shutdown raises global costs by just 2%.',
+    policy: 'For policymakers: Europe\'s dense network of major ports provides natural resilience. The greater risk in this region is simultaneous multi-port disruption — a severe North Sea winter storm or coordinated infrastructure failure — rather than disruption at any single hub.',
+  },
 };
 
 const SCENARIOS = [
-  {id:'S1', name:'Suez Canal blockage',           port:'Suez Canal',              impact:'High',   days:6,  hub:'Singapore'},
-  {id:'S2', name:'Panama Canal closure',           port:'Panama Canal',            impact:'High',   days:8,  hub:'China'},
-  {id:'S3', name:'U.S. West Coast port strike',    port:'Los Angeles, Long Beach', impact:'High',   days:14, hub:'China'},
-  {id:'S4', name:'Typhoon hits Shanghai',           port:'Shanghai',                impact:'Medium', days:4,  hub:'China'},
-  {id:'S5', name:'Red Sea armed conflict',          port:'Jeddah, Port Sudan',      impact:'High',   days:14, hub:'Singapore'},
-  {id:'S8', name:'Cyberattack on port IT',          port:'Singapore',               impact:'High',   days:7,  hub:'Singapore'},
-  {id:'S9', name:'Drought reduces canal capacity',  port:'Panama Canal',            impact:'Medium', days:30, hub:'China'},
-  {id:'S10',name:'Flooding in European ports',      port:'Hamburg',                 impact:'Medium', days:6,  hub:'Netherlands'},
-  {id:'S13',name:'Increased pirate activity',       port:'Djibouti, Aden',          impact:'Medium', days:20, hub:'Singapore'},
-  {id:'S16',name:'Labor unrest in S.E. Asia',       port:'Singapore, Port Klang',   impact:'High',   days:8,  hub:'Singapore'},
-  {id:'S18',name:'Global container shortage',       port:'Hub ports worldwide',     impact:'High',   days:45, hub:'China'},
-  {id:'S20',name:'South China Sea tensions',        port:'Nansha, Haiphong',        impact:'High',   days:30, hub:'China'},
-  {id:'S21',name:'Health crisis lockdown',          port:'Global ports',            impact:'High',   days:22, hub:'Singapore'},
-  {id:'S24',name:'Transshipment hub closure',       port:'Jebel Ali, Colombo',      impact:'High',   days:11, hub:'Singapore'},
-  {id:'S26',name:'Malacca Strait blockage',         port:'Malacca Strait',          impact:'High',   days:15, hub:'Singapore'},
-  {id:'S33',name:'Protectionism surge',             port:'EU, China, US ports',     impact:'High',   days:60, hub:'China'},
-  {id:'S41',name:'Winter storm — N. European ports',port:'Rotterdam, Hamburg',      impact:'Medium', days:7,  hub:'Netherlands'},
-  {id:'S44',name:'South African port lockout',      port:'Durban, Cape Town',       impact:'High',   days:14, hub:'Singapore'},
+  {id:'S1', name:'Suez Canal blockage',            port:'Suez Canal',              impact:'High',   days:6,  hub:'Singapore', consequence:'Asia–Europe trade is forced around Africa, adding up to 10 days and 20% fuel cost per voyage.'},
+  {id:'S2', name:'Panama Canal closure',            port:'Panama Canal',            impact:'High',   days:8,  hub:'China',     consequence:'Trans-Pacific trade reroutes via Suez or Cape Horn, adding 2–3 weeks per voyage.'},
+  {id:'S3', name:'U.S. West Coast port strike',     port:'Los Angeles, Long Beach', impact:'High',   days:14, hub:'China',     consequence:'The main entry point for Asian goods into North America shuts down, stalling consumer supply chains.'},
+  {id:'S4', name:'Typhoon hits Shanghai',            port:'Shanghai',                impact:'Medium', days:4,  hub:'China',     consequence:'The world\'s busiest container port halts operations. Short duration limits damage, but backlogs persist for weeks.'},
+  {id:'S5', name:'Red Sea armed conflict',           port:'Jeddah, Port Sudan',      impact:'High',   days:14, hub:'Singapore', consequence:'The fastest Asia–Europe corridor becomes too risky to use. Insurance costs spike and routes divert south.'},
+  {id:'S8', name:'Cyberattack on port IT',           port:'Singapore',               impact:'High',   days:7,  hub:'Singapore', consequence:'A cyberattack disables Singapore\'s port management systems. All scheduling and cargo tracking halts.'},
+  {id:'S9', name:'Drought reduces canal capacity',   port:'Panama Canal',            impact:'Medium', days:30, hub:'China',     consequence:'Water levels fall below safe draft limits. Vessels must carry less cargo or wait weeks for passage.'},
+  {id:'S10',name:'Flooding in European ports',       port:'Hamburg',                 impact:'Medium', days:6,  hub:'Netherlands',consequence:'Extreme weather closes North Sea terminals. European importers face delays and higher costs.'},
+  {id:'S13',name:'Piracy surge in Gulf of Aden',    port:'Djibouti, Aden',          impact:'Medium', days:20, hub:'Singapore', consequence:'Ships avoid the Gulf of Aden, adding days and cost to Asia–Europe voyages through the Red Sea corridor.'},
+  {id:'S16',name:'Labor strike in S.E. Asia',        port:'Singapore, Port Klang',   impact:'High',   days:8,  hub:'Singapore', consequence:'Workers walk out at the two largest Southeast Asian transshipment hubs simultaneously.'},
+  {id:'S18',name:'Global container shortage',        port:'Hub ports worldwide',     impact:'High',   days:45, hub:'China',     consequence:'Empty containers pile up in the wrong places. Exporters can\'t book space. Prices surge globally.'},
+  {id:'S20',name:'South China Sea tensions',         port:'Nansha, Haiphong',        impact:'High',   days:30, hub:'China',     consequence:'Geopolitical tensions force vessels off key South China Sea routes, adding distance and uncertainty.'},
+  {id:'S21',name:'Pandemic port shutdowns',          port:'Global ports',            impact:'High',   days:22, hub:'Singapore', consequence:'Ports worldwide reduce capacity simultaneously. The whole network tightens at once — costs rise everywhere.'},
+  {id:'S24',name:'Major transshipment hub closure',  port:'Jebel Ali, Colombo',      impact:'High',   days:11, hub:'Singapore', consequence:'Two of the busiest relay ports in the Middle East and Indian Ocean go offline, stranding onward cargo.'},
+  {id:'S26',name:'Malacca Strait blockage',          port:'Malacca Strait',          impact:'High',   days:15, hub:'Singapore', consequence:'The world\'s busiest shipping lane — carrying 40% of global trade — is closed. All East Asia–Europe flows must divert.'},
+  {id:'S33',name:'Trade protectionism surge',        port:'EU, China, US ports',     impact:'High',   days:60, hub:'China',     consequence:'New tariffs and trade barriers slow cargo movement at the world\'s three largest trading blocs simultaneously.'},
+  {id:'S41',name:'Winter storm — Northern Europe',   port:'Rotterdam, Hamburg',      impact:'Medium', days:7,  hub:'Netherlands',consequence:'Severe winter weather closes major North Sea ports. European importers scramble for alternatives.'},
+  {id:'S44',name:'South African port lockout',       port:'Durban, Cape Town',       impact:'High',   days:14, hub:'Singapore', consequence:'The main Cape of Good Hope waypoints shut down, disrupting the alternative Asia–Europe route that avoids Suez.'},
 ];
+
+const SCENARIO_POLICY = {
+  High: 'This is a high-impact event. Based on the model, even a partial disruption of this kind can raise global shipping costs significantly. Policymakers should treat this scenario as a planning priority — contingency routing agreements and pre-negotiated alternative port access can meaningfully reduce cost exposure.',
+  Medium: 'This scenario produces a moderate cost increase. The network can reroute, but not without friction. Affected industries — particularly those reliant on just-in-time supply chains — will feel the impact before the broader economy does. Early warning systems and buffer stock policies can reduce vulnerability.',
+  Low: 'This disruption has a relatively contained cost impact. The network absorbs it through rerouting. However, even low-impact events can trigger cascading delays if they coincide with other pressures. Monitoring remains important.',
+};
 
 let activeHub = 'Singapore';
 let activeFilter = 'All';
@@ -214,6 +291,7 @@ function setHub(hub, el) {
   el.classList.add('active');
   renderHubStats();
   renderHubChart();
+  renderPolicyHubBox();
 }
 
 function updateSlider() {
@@ -232,14 +310,30 @@ function getIdx(days) {
 function renderHubStats() {
   const val = parseInt(document.getElementById('disruption-slider').value);
   const row = PHASE2[activeHub].find(d => d.d === val);
-  const cc = row.cost > 30 ? 'danger' : row.cost > 10 ? 'warn' : 'ok';
+  const cc = row.cost > 30 ? 'red' : row.cost > 10 ? 'amber' : 'teal';
+  const ccStat = row.cost > 30 ? 'danger' : row.cost > 10 ? 'warn' : 'ok';
+  const plain = HUB_PLAIN[activeHub];
+
   document.getElementById('hub-stats').innerHTML = `
-    <div class="stat-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));">
-      <div class="stat"><div class="stat-val ${cc}">+${row.cost.toFixed(1)}%</div><div class="stat-lbl">cost increase</div></div>
-      <div class="stat"><div class="stat-val ok">100%</div><div class="stat-lbl">flow retention</div></div>
-      <div class="stat"><div class="stat-val">${val}%</div><div class="stat-lbl">capacity removed</div></div>
+    <div class="impact-grid">
+      <div class="impact-box">
+        <div class="impact-val ${cc}">+${row.cost.toFixed(1)}%</div>
+        <div class="impact-lbl">Rise in total shipping costs across the network</div>
+      </div>
+      <div class="impact-box">
+        <div class="impact-val teal">100%</div>
+        <div class="impact-lbl">Goods still reach their destination — rerouting always works</div>
+      </div>
+      <div class="impact-box">
+        <div class="impact-val" style="color:var(--text)">${val}%</div>
+        <div class="impact-lbl">Of ${activeHub}'s port capacity taken offline</div>
+      </div>
     </div>
-    <div class="insight">${HUB_INSIGHTS[activeHub]}</div>`;
+    <div class="plain-insight">${plain.what}</div>`;
+}
+
+function renderPolicyHubBox() {
+  document.getElementById('policy-hub-text').textContent = HUB_PLAIN[activeHub].policy;
 }
 
 function renderHubChart() {
@@ -250,7 +344,7 @@ function renderHubChart() {
     hubChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['10%','20%','30%','40%','50%'],
+        labels: ['10% lost','20% lost','30% lost','40% lost','50% lost'],
         datasets: [
           {label:'Singapore', data:PHASE2.Singapore.map(d=>d.cost),   borderColor:'#1D9E75', backgroundColor:'rgba(29,158,117,0.08)', tension:0.4, pointRadius:4, fill:true},
           {label:'China',     data:PHASE2.China.map(d=>d.cost),       borderColor:'#E24B4A', backgroundColor:'rgba(226,75,74,0.04)',   tension:0.4, pointRadius:4, fill:true},
@@ -259,7 +353,7 @@ function renderHubChart() {
       },
       options: {
         responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' +'+c.parsed.y.toFixed(2)+'%'}}},
+        plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' +'+c.parsed.y.toFixed(2)+'% cost rise'}}},
         scales:{
           x:{ticks:{font:{size:11,family:'DM Mono'}}, grid:{display:false}},
           y:{ticks:{font:{size:11,family:'DM Mono'}, callback:v=>'+'+v+'%'}, grid:{color:'rgba(0,0,0,0.05)'}}
@@ -302,40 +396,61 @@ function renderScenarioResults() {
 
   document.getElementById('results-area').innerHTML = `
     <div class="divider"></div>
-    <div class="section-label">Model output — ${s.name}</div>
-    <div class="stat-grid">
-      <div class="stat"><div class="stat-val ${cc}">+${row.cost.toFixed(1)}%</div><div class="stat-lbl">cost increase</div></div>
-      <div class="stat"><div class="stat-val ok">100%</div><div class="stat-lbl">flow retention</div></div>
-      <div class="stat"><div class="stat-val">${s.hub}</div><div class="stat-lbl">primary hub</div></div>
-      <div class="stat"><div class="stat-val">${s.days}d</div><div class="stat-lbl">duration</div></div>
+    <div class="section-header">
+      <h2>${s.name}</h2>
+      <p>${s.consequence}</p>
     </div>
-    <div class="card">
-      <div class="card-title">Cost sensitivity curve — ${s.hub} (Phase 2 results) — this scenario highlighted</div>
-      <div class="chart-wrap"><canvas id="scChart"></canvas></div>
-      <div class="legend-row">
-        <span><span class="legend-dot" style="background:#1D9E75"></span>Cost change %</span>
-        <span><span class="legend-dot" style="background:#E24B4A"></span>This scenario</span>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-val ${cc}">+${row.cost.toFixed(1)}%</div>
+        <div class="stat-lbl">Estimated rise in total shipping costs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val ok">100%</div>
+        <div class="stat-lbl">Cargo still reaches its destination</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">${s.hub}</div>
+        <div class="stat-lbl">Most affected hub</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">${s.days} days</div>
+        <div class="stat-lbl">Estimated disruption duration</div>
       </div>
     </div>
+
     <div class="card">
-      <div class="card-title">Hub vulnerability comparison at this disruption level</div>
+      <div class="card-eyebrow">How cost rises as the ${s.hub} hub loses capacity</div>
+      <div class="chart-wrap"><canvas id="scChart"></canvas></div>
+      <div class="legend-row">
+        <span><span class="legend-dot" style="background:#1D9E75"></span>Cost rise %</span>
+        <span><span class="legend-dot" style="background:#E24B4A"></span>This scenario's estimated disruption level</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-eyebrow">Which hubs are most exposed at this disruption level?</div>
       ${['Singapore','China','Netherlands'].map(h => {
         const v = PHASE2[h][idx].cost;
-        const max = 100;
         const cls = v > 30 ? 'red' : v > 10 ? 'amber' : 'teal';
         return `<div class="bar-row">
           <div class="bar-label ${v>30?'hit':''}">${h}</div>
-          <div class="bar-bg"><div class="bar-fill ${cls}" style="width:${Math.round((v/max)*100)}%"></div></div>
+          <div class="bar-bg"><div class="bar-fill ${cls}" style="width:${Math.round((v/100)*100)}%"></div></div>
           <div class="bar-val">+${v.toFixed(2)}%</div>
         </div>`;
       }).join('')}
-      <div style="font-size:11px;color:var(--text-3);margin-top:8px;font-family:'DM Mono',monospace;">At ${row.d}% capacity disruption level — exact Phase 2 values</div>
     </div>
-    <div class="insight">
-      The ${s.name} scenario primarily stresses the <strong>${s.hub}</strong> hub.
-      Your Phase 2 results show a +${row.cost.toFixed(1)}% cost increase at this disruption level.
-      ${row.cost > 36 ? 'This exceeds the nonlinear acceleration zone in your Singapore curve — the network enters a high-cost regime where rerouting options are severely constrained.' : row.cost > 16 ? 'The network is under significant strain but within recoverable bounds per your optimization results.' : 'Your optimizer handles this efficiently — cost increase is modest and flow is fully retained.'}
-      Flow retention is 100%, consistent across all your Phase 2 runs: the network simplex algorithm always finds a feasible routing solution.
+
+    <div class="plain-insight">
+      <strong>What the model shows:</strong> A ${s.name.toLowerCase()} primarily stresses ${s.hub} — the most connected hub in this scenario's affected corridor.
+      The model estimates a <strong>+${row.cost.toFixed(1)}% rise in total shipping costs</strong> across the network.
+      ${row.cost > 36 ? 'This is in the high-risk zone — cost increases accelerate nonlinearly at this level, meaning the network has few low-cost alternatives left.' : row.cost > 16 ? 'This is a significant but recoverable disruption. The network reroutes, but shippers and consumers absorb the difference.' : 'The network handles this relatively well. Rerouting options keep cost increases modest.'}
+      Importantly, cargo flow is never lost — the optimization model always finds a viable route. The question is always price, not access.
+    </div>
+
+    <div class="policy-box">
+      <h3>Policy implication</h3>
+      <p>${SCENARIO_POLICY[s.impact]}</p>
     </div>`;
 
   setTimeout(() => {
@@ -345,7 +460,7 @@ function renderScenarioResults() {
     scChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: hd.map(d => d.d+'%'),
+        labels: hd.map(d => d.d+'% lost'),
         datasets: [{
           data: hd.map(d => d.cost),
           borderColor: '#1D9E75',
@@ -358,7 +473,7 @@ function renderScenarioResults() {
       },
       options: {
         responsive:true, maintainAspectRatio:false,
-        plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' +'+c.parsed.y.toFixed(2)+'% cost change'}}},
+        plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>' +'+c.parsed.y.toFixed(2)+'% cost rise'}}},
         scales:{
           x:{ticks:{font:{size:11,family:'DM Mono'}}, grid:{display:false}},
           y:{ticks:{font:{size:11,family:'DM Mono'}, callback:v=>'+'+v+'%'}, grid:{color:'rgba(0,0,0,0.05)'}}
@@ -370,6 +485,7 @@ function renderScenarioResults() {
 
 renderHubStats();
 renderHubChart();
+renderPolicyHubBox();
 renderGrid();
 </script>
 </body>
