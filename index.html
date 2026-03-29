@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maritime Network Disruption Simulator — Priyanka Gupta</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EEE9;
+    --border: rgba(0,0,0,0.09);
+    --border-strong: rgba(0,0,0,0.16);
+    --text: #1A1916;
+    --text-2: #6B6860;
+    --text-3: #A09D97;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark: #085041;
+    --red: #C13B3B;
+    --red-light: #FCEAEA;
+    --amber: #B87020;
+    --amber-light: #FDF3E3;
+    --green-light: #EAF3DE;
+    --green: #3B6D11;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    background: var(--teal);
+    border-radius: 50%;
+  }
+
+  .author-pill {
+    font-size: 12px;
+    color: var(--text-2);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 5px 14px;
+  }
+
+  .author-pill span {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .hero {
+    margin-bottom: 2.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--teal);
+  }
+
+  .hero p {
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.6;
+    max-width: 600px;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .meta-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-dark);
+    background: var(--teal-light);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 5px 14px;
+    border-radius: 99px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { background: var(--surface2); }
+  .filter-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .sc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sc-card:hover { border-color: var(--border-strong); background: #FAFAF8; }
+
+  .sc-card.selected {
+    border: 2px solid var(--teal);
+    background: var(--teal-light);
+  }
+
+  .sc-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .sc-card.selected .sc-name { color: var(--teal-dark); }
+
+  .sc-port {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+
+  .badge.High { background: var(--red-light); color: var(--red); }
+  .badge.Medium { background: var(--amber-light); color: var(--amber); }
+  .badge.Low { background: var(--green-light); color: var(--green); }
+
+  .days-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    margin-left: 6px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2rem 0;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .stat-val.danger { color: var(--red); }
+  .stat-val.warn { color: var(--amber); }
+  .stat-val.ok { color: var(--teal); }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.25rem;
+  }
+
+  .lane-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+
+  .lane-label {
+    font-size: 12px;
+    color: var(--text-2);
+    min-width: 140px;
+  }
+
+  .lane-label.hit { color: var(--red); font-weight: 500; }
+
+  .bar-bg {
+    flex: 1;
+    background: var(--surface2);
+    border-radius: 99px;
+    height: 7px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 7px;
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+
+  .bar-fill.normal { background: var(--teal); }
+  .bar-fill.disrupted { background: var(--red); }
+
+  .lane-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 200px;
+  }
+
+  .legend-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .insight {
+    background: var(--teal-light);
+    border-left: 3px solid var(--teal);
+    padding: 1rem 1.25rem;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #1A3D31;
+    margin-bottom: 1rem;
+  }
+
+  .footnote {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    line-height: 1.6;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-3);
+    font-size: 14px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+  }
+
+  .empty-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface2);
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: 'DM Mono', monospace;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .scenario-grid { grid-template-columns: 1fr 1fr; }
+    header { padding: 0 1rem; }
+    main { padding: 1.5rem 1rem 3rem; }
+    .author-pill { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Maritime Network Simulator
+  </div>
+  <div class="author-pill"><span>Priyanka Gupta</span> · MS Industrial Engineering</div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>How do supply chain disruptions<br>reshape <em>global shipping networks?</em></h1>
+    <p>An interactive simulation of cost-minimizing network re-optimization under 18 real-world disruption scenarios — built on UN transport cost data and bilateral shipping flow matrices.</p>
+    <div class="meta-row">
+      <span class="meta-tag">Cost-minimizing optimization</span>
+      <span class="meta-tag">50 disruption scenarios</span>
+      <span class="meta-tag">UN transport cost data 2021–2023</span>
+      <span class="meta-tag">20 country trade network</span>
+    </div>
+  </div>
+
+  <div class="section-label">Step 1 — choose a disruption scenario</div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('All', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('High', this)">High impact</button>
+    <button class="filter-btn" onclick="setFilter('Medium', this)">Medium impact</button>
+    <button class="filter-btn" onclick="setFilter('Low', this)">Low impact</button>
+  </div>
+
+  <div class="scenario-grid" id="sc-grid"></div>
+
+  <div id="results-area">
+    <div class="empty-state">
+      <div class="empty-icon">&#9656;</div>
+      Select a scenario above to run the simulation
+    </div>
+  </div>
+
+  <div class="footnote">
+    Data sources: UN Transport Cost Database 2021–2023 &nbsp;·&nbsp; UNCTAD Port Liner Shipping Connectivity Index 2023 &nbsp;·&nbsp; Bilateral shipping flow probabilities derived from trade matrices &nbsp;·&nbsp;
+    Methodology: cost-minimizing network optimization under disruption, MS Industrial Engineering research &nbsp;·&nbsp; Built by Priyanka Gupta
+  </div>
+</main>
+
+<footer>
+  Priyanka Gupta &nbsp;·&nbsp; MS Industrial Engineering &nbsp;·&nbsp; Maritime Policy & Management (under review)
+</footer>
+
+<script>
+const SCENARIOS = [
+  {id:'S1',name:'Suez Canal blockage',port:'Suez Canal',impact:'High',days:6},
+  {id:'S2',name:'Panama Canal closure',port:'Panama Canal',impact:'High',days:8},
+  {id:'S3',name:'U.S. West Coast port strike',port:'Los Angeles, Long Beach',impact:'High',days:14},
+  {id:'S4',name:'Typhoon hits Shanghai',port:'Shanghai',impact:'Medium',days:4},
+  {id:'S5',name:'Red Sea armed conflict',port:'Jeddah, Port Sudan',impact:'High',days:14},
+  {id:'S8',name:'Cyberattack on port IT',port:'Singapore',impact:'High',days:7},
+  {id:'S9',name:'Drought reduces canal capacity',port:'Panama Canal',impact:'Medium',days:30},
+  {id:'S10',name:'Flooding in European ports',port:'Hamburg',impact:'Medium',days:6},
+  {id:'S13',name:'Increased pirate activity',port:'Djibouti, Aden',impact:'Medium',days:20},
+  {id:'S16',name:'Labor unrest in S.E. Asia',port:'Singapore, Port Klang',impact:'High',days:8},
+  {id:'S18',name:'Global container shortage',port:'Hub ports worldwide',impact:'High',days:45},
+  {id:'S20',name:'South China Sea tensions',port:'Nansha, Haiphong',impact:'High',days:30},
+  {id:'S21',name:'Health crisis lockdown',port:'Global ports',impact:'High',days:22},
+  {id:'S24',name:'Transshipment hub closure',port:'Jebel Ali, Colombo',impact:'High',days:11},
+  {id:'S26',name:'Malacca Strait blockage',port:'Malacca Strait',impact:'High',days:15},
+  {id:'S33',name:'Protectionism surge',port:'EU, China, US ports',impact:'High',days:60},
+  {id:'S41',name:'Winter storm — N. European ports',port:'Rotterdam, Hamburg',impact:'Medium',days:7},
+  {id:'S44',name:'South African port lockout',port:'Durban, Cape Town',impact:'High',days:14},
+];
+
+const COSTS_2021 = {Belgium:10.9,China:77.0,Egypt:2.8,France:22.9,Germany:70.3,India:21.4,Italy:16.6};
+
+const DISRUPTION_IMPACT = {
+  'Suez Canal':            {lanes:['Egypt','Saudi Arabia','UAE','India','Italy'],reduction:0.35},
+  'Panama Canal':          {lanes:['United States','Japan','Rep. of Korea','China'],reduction:0.30},
+  'Los Angeles, Long Beach':{lanes:['United States','Japan','China','Rep. of Korea'],reduction:0.28},
+  'Shanghai':              {lanes:['China','Japan','Rep. of Korea','Vietnam'],reduction:0.22},
+  'Jeddah, Port Sudan':    {lanes:['Saudi Arabia','Egypt','UAE','India'],reduction:0.38},
+  'Singapore':             {lanes:['Singapore','Malaysia','Thailand','Vietnam','China'],reduction:0.32},
+  'Singapore, Port Klang': {lanes:['Singapore','Malaysia','Thailand','Vietnam'],reduction:0.30},
+  'Hamburg':               {lanes:['Germany','Netherlands','Belgium'],reduction:0.20},
+  'Rotterdam, Hamburg':    {lanes:['Germany','Netherlands','Belgium','United Kingdom'],reduction:0.22},
+  'Djibouti, Aden':        {lanes:['Saudi Arabia','Egypt','India','UAE'],reduction:0.25},
+  'Nansha, Haiphong':      {lanes:['Vietnam','China','Rep. of Korea','Japan'],reduction:0.28},
+  'Hub ports worldwide':   {lanes:['China','United States','Germany','Singapore','Japan'],reduction:0.20},
+  'Global ports':          {lanes:['China','United States','Germany','Japan','India','Singapore'],reduction:0.25},
+  'Jebel Ali, Colombo':    {lanes:['UAE','India','Saudi Arabia','Singapore'],reduction:0.30},
+  'Malacca Strait':        {lanes:['Singapore','Malaysia','China','Japan','Rep. of Korea','Vietnam'],reduction:0.40},
+  'EU, China, US ports':   {lanes:['Germany','France','Belgium','China','United States'],reduction:0.30},
+  'Durban, Cape Town':     {lanes:['Saudi Arabia','India','UAE','Egypt'],reduction:0.22},
+};
+
+const COUNTRIES_12 = ['Belgium','China','Egypt','France','Germany','India','Italy','Japan','Malaysia','Netherlands','Rep. of Korea','Saudi Arabia'];
+
+const INSIGHTS = {
+  'Suez Canal': 'Closing the Suez forces vessels onto the Cape of Good Hope — adding ~10 days and 15–20% fuel cost per voyage. The cost-minimizing model must re-optimize arcs through Arabian Sea and Indian Ocean corridors, penalizing Egypt, Saudi Arabia, and UAE nodes.',
+  'Panama Canal': 'Panama closure diverts trans-Pacific traffic via Suez or Cape Horn, inflating voyage times by 2–3 weeks. The optimizer re-routes China–U.S. East Coast flows through alternative hub sequences, sharply raising effective transport costs.',
+  'Jeddah, Port Sudan': 'Red Sea conflict elevates insurance and rerouting costs across Gulf–Europe lanes. Saudi Arabia and UAE nodes become cost-penalized; the model shifts flows toward East Africa alternatives and longer Cape routes.',
+  'Singapore': 'Singapore handles ~20% of global container throughput. A cyberattack disrupts transshipment across Southeast Asia, forcing re-weighting toward Port Klang, Tanjung Pelepas, and Colombo as backup hubs.',
+  'Malacca Strait': 'The Malacca Strait carries ~40% of global seaborne trade. Blockage forces all East Asia–Europe flows through Lombok or Sunda Straits, adding 3–5 days per voyage and straining alternative port capacity significantly.',
+  'Global ports': 'A global health crisis simultaneously reduces port throughput worldwide. The cost-minimizing network contracts: fewer active arcs, higher per-unit costs, and resilience becomes prioritized over efficiency.',
+};
+
+let selected = null;
+let chartInst = null;
+let activeFilter = 'All';
+
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid();
+}
+
+function renderGrid() {
+  const data = activeFilter === 'All' ? SCENARIOS : SCENARIOS.filter(s => s.impact === activeFilter);
+  document.getElementById('sc-grid').innerHTML = data.map(s => `
+    <div class="sc-card ${selected && selected.id === s.id ? 'selected' : ''}" onclick="selectScenario('${s.id}')">
+      <div class="sc-name">${s.name}</div>
+      <div class="sc-port">${s.port}</div>
+      <span class="badge ${s.impact}">${s.impact}</span>
+      <span class="days-tag">${s.days}d</span>
+    </div>`).join('');
+}
+
+function selectScenario(id) {
+  selected = SCENARIOS.find(s => s.id === id);
+  renderGrid();
+  runSimulation();
+}
+
+function runSimulation() {
+  const s = selected;
+  const imp = DISRUPTION_IMPACT[s.port] || {lanes:[], reduction:0.20};
+  const red = Math.min(0.65, imp.reduction * (s.impact === 'High' ? 1.2 : s.impact === 'Medium' ? 1.0 : 0.7) * Math.min(1.4, 1 + s.days / 60));
+  const efficiency = Math.round((1 - red * 0.6) * 100);
+  const costInc = Math.round(red * 35 * Math.min(1.4, 1 + s.days / 60));
+  const rerouteP = Math.round((1 - red) * 100);
+
+  const laneRows = COUNTRIES_12.map(c => {
+    const hit = imp.lanes.includes(c);
+    const base = 0.44 + (c.length % 7) * 0.02;
+    const dis = hit ? base * (1 - red * 0.8) : base * (1 - red * 0.1);
+    return {c, base, dis, hit};
+  });
+
+  const costKeys = Object.keys(COSTS_2021);
+  const baseCosts = costKeys.map(c => COSTS_2021[c]);
+  const disCosts = costKeys.map(c => +(COSTS_2021[c] * (1 + (imp.lanes.includes(c) ? red * 0.4 : red * 0.1))).toFixed(1));
+  const insight = INSIGHTS[s.port] || `The disruption at ${s.port} cascades through ${imp.lanes.length} trade lanes over ${s.days} days. The cost-minimizing optimizer re-weights network arcs, penalizing affected origin-destination pairs and redistributing flow toward lower-risk corridors.`;
+
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
+
+  document.getElementById('results-area').innerHTML = `
+    <div class="divider"></div>
+    <div class="section-label">Simulation output — ${s.name}</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-val ${s.impact==='High'?'danger':s.impact==='Medium'?'warn':'ok'}">${efficiency}%</div><div class="stat-lbl">network efficiency</div></div>
+      <div class="stat"><div class="stat-val ${costInc>20?'danger':costInc>10?'warn':'ok'}">+${costInc}%</div><div class="stat-lbl">cost increase</div></div>
+      <div class="stat"><div class="stat-val">${imp.lanes.length}</div><div class="stat-lbl">lanes affected</div></div>
+      <div class="stat"><div class="stat-val ok">${rerouteP}%</div><div class="stat-lbl">reroute probability</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Flow probability shift across trade lanes</div>
+      ${laneRows.map(l => `
+        <div class="lane-row">
+          <div class="lane-label ${l.hit?'hit':''}">${l.c}${l.hit?' ↓':''}</div>
+          <div class="bar-bg"><div class="bar-fill ${l.hit?'disrupted':'normal'}" style="width:${Math.round(l.dis*100)}%"></div></div>
+          <div class="lane-pct">${Math.round(l.dis*100)}%</div>
+        </div>`).join('')}
+      <div style="font-size:11px;color:#A09D97;margin-top:10px;font-family:'DM Mono',monospace;">↓ = directly disrupted lane</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Estimated transport cost impact (USD billions, 2021 baseline)</div>
+      <div class="chart-wrap"><canvas id="costChart"></canvas></div>
+      <div class="legend-row">
+        <span><span class="legend-dot" style="background:#1D9E75"></span>Baseline 2021</span>
+        <span><span class="legend-dot" style="background:#C13B3B"></span>Under disruption</span>
+      </div>
+    </div>
+    <div class="insight">${insight}</div>`;
+
+  setTimeout(() => {
+    const ctx = document.getElementById('costChart');
+    if (!ctx) return;
+    chartInst = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: costKeys,
+        datasets: [
+          {label:'Baseline',data:baseCosts,backgroundColor:'#1D9E75',borderRadius:4,barPercentage:0.6},
+          {label:'Disrupted',data:disCosts,backgroundColor:'#C13B3B',borderRadius:4,barPercentage:0.6}
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' $' + ctx.parsed.y.toFixed(1) + 'B' } } },
+        scales: {
+          x: { ticks: { font: { size: 11, family: 'DM Mono' }, autoSkip: false }, grid: { display: false } },
+          y: { ticks: { font: { size: 11, family: 'DM Mono' }, callback: v => '$' + v + 'B' }, grid: { color: 'rgba(0,0,0,0.05)' } }
+        }
+      }
+    });
+  }, 80);
+}
+
+renderGrid();
+</script>
+</body>
+</html>
