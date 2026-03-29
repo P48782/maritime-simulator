@@ -12,7 +12,7 @@ Around 80% of world trade moves by sea. When a major port or shipping corridor i
 
 This tool lets you explore exactly how much costs rise, which hubs are most vulnerable, and what the data says about resilience — across 18 real-world disruption scenarios.
 
-**[Live demo →](https://priyanka48782.github.io/maritime-simulator)**
+**[Live demo →]([https://p48782.github.io/maritime-simulator/])**
 
 ---
 
@@ -112,4 +112,4 @@ The model reveals that network resilience is highly asymmetric. Some hubs (Singa
 
 **Priyanka Gupta**  
 MS Industrial Engineering, UNC Charlotte  
-[LinkedIn](https://linkedin.com/in/priyanka-gupta) · pgupta19@charlotte.edu
+[LinkedIn](https://www.linkedin.com/in/priyanka-gupta-10thfeb/) · pgupta19@charlotte.edu
